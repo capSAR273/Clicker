@@ -1,0 +1,24 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Copy Folder to Anniversary",
+            "type": "shell",
+            "command": "xcopy",
+            "args": [
+                "/E",
+                "/I",
+                "/Y",
+                "${workspaceFolder}",
+                "C:\\Super Fast Games\\World of Warcraft\\_anniversary_\\Interface\\AddOns\\Clicker"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always"
+            },
+            "problemMatcher": []
+        }
+    ]
+}
