@@ -37,19 +37,23 @@ function SlashCmdList.CLICKER(msg, editbox)
 
     elseif command == "volume" then
         local volume = tonumber(rest)
-        if volume == 6 then
-            ClickerDB.useClick = "click6"
+        if volume == 1 then
+            ClickerDB.useClick = "clicker"
+            print("Clicker Volume Set to default")
+        elseif volume == 6 then
+            ClickerDB.useClick = "clicker6"
             print("Clicker Volume Set to +6db")
         elseif volume == 12 then
-            ClickerDB.useClick = "click12"
+            ClickerDB.useClick = "clicker12"
             print("Clicker Volume Set to +12db")
         else
             print("Invalid volume. Please enter a value between 0 and 100.")
         end
 
     elseif command == "test" then
-        if not ClickerDB.muted then PlaySoundFile("Interface\\Addons\\Clicker\\Media\\clicker.ogg", "Dialog")
-        print("Clicker Test Sound Played")
+        if not ClickerDB.muted then 
+            PlaySoundFile("Interface\\Addons\\Clicker\\Media\\" .. ClickerDB.useClick .. ".ogg", "Dialog")
+        print("Clicker Test Sound Played, filename is " .. ClickerDB.useClick .. ".ogg")
         end
 
     elseif command == "test6" then
@@ -65,6 +69,7 @@ function SlashCmdList.CLICKER(msg, editbox)
         print("Clicker Addon Commands:")
         print("/clicker show - Show the Clicker settings frame.")
         print("/clicker mute - Toggle mute on/off for Clicker.")
+        print("/clicker volume [0|6|12] - Set click sound volume. 0=default, 6=+6db, 12=+12db.")
         print("/clicker test - Play test click sound.")
         print("/clicker test6 - Play test +6db click sound.")
         print("/clicker test12 - Play test +12db click sound.")
