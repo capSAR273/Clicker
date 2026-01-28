@@ -21,20 +21,54 @@ mainFrame:SetScript("OnShow", function(self)
 end)
 
 SLASH_CLICKER1 = "/clicker"
-SlashCmdList["CLICKER"] = function()
-    if mainFrame:IsShown() then
-        mainFrame:Hide()
-    else
-        mainFrame:Show()
-    end
-end
+function SlashCmdList.CLICKER(msg, editbox)
+    local command, rest = msg:match("^(%S*)%s*(.-)$")
+    command = strlower(command or "")
+    rest = strlower(rest or "")
 
-SLASH_CLICKER2 = "/clickermute"
-SlashCmdList["CLICKERMUTE"] = function()
-   -- Toggle mute functionality here
-    local clickerMuted = not ClickerDB.muted
-    ClickerDB.muted = clickerMuted
-    print("Clicker Mute Toggled")
+    if command == "show" then
+        mainFrame:Show()
+
+    elseif command == "mute" then
+        -- Toggle mute functionality here
+        local clickerMuted = not ClickerDB.muted
+        ClickerDB.muted = clickerMuted
+        print("Clicker Mute Toggled to " .. tostring(clickerMuted))
+
+    elseif command == "volume" then
+        local volume = tonumber(rest)
+        if volume == 6 then
+            ClickerDB.useClick = "click6"
+            print("Clicker Volume Set to +6db")
+        elseif volume == 12 then
+            ClickerDB.useClick = "click12"
+            print("Clicker Volume Set to +12db")
+        else
+            print("Invalid volume. Please enter a value between 0 and 100.")
+        end
+
+    elseif command == "test" then
+        if not ClickerDB.muted then PlaySoundFile("Interface\\Addons\\Clicker\\Media\\clicker.ogg", "Dialog")
+        print("Clicker Test Sound Played")
+        end
+
+    elseif command == "test6" then
+        if not ClickerDB.muted then PlaySoundFile("Interface\\Addons\\Clicker\\Media\\clicker6.ogg", "Dialog")
+        print("Clicker Test +6db Sound Played")
+        end
+
+    elseif command == "test12" then
+        if not ClickerDB.muted then PlaySoundFile("Interface\\Addons\\Clicker\\Media\\clicker12.ogg", "Dialog")
+        print("Clicker Test +12db Sound Played")
+        end
+    else
+        print("Clicker Addon Commands:")
+        print("/clicker show - Show the Clicker settings frame.")
+        print("/clicker mute - Toggle mute on/off for Clicker.")
+        print("/clicker test - Play test click sound.")
+        print("/clicker test6 - Play test +6db click sound.")
+        print("/clicker test12 - Play test +12db click sound.")
+    end
 end
 
 local eventListenerFrame = CreateFrame("Frame", "ClickerEventListenerFrame", UIParent)
