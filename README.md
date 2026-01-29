@@ -17,3 +17,5 @@ If you run into any issues with the addon, please create a GitHub issue and spec
 This addon would not be possible without the amazing community from the WowUIDev Discord, specifically "Numy"!
 
 Font licensed for commercial use by http://bythebutterfly.com https://www.fontspace.com/bythebutterfly
+
+Implementation of toast-like achievement made possible by https://github.com/shagu/ShaguNotify with some tweaking.
