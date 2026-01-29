@@ -76,6 +76,18 @@ function Clicker:BuildOptionsPanel()
                         get = function(info) return self.db.profile.toastText end,
                         set = function(info, value) self.db.profile.toastText = value end,
                     },
+                    testClick = {
+                        type = "execute",
+                        name = "Test Click Sound",
+                        desc = "Play a test click sound.",
+                        order = 1.4,
+                        func = function()
+                            if not self.db.profile.muted then 
+                                PlaySoundFile("Interface\\Addons\\Clicker\\Media\\" .. self.db.profile.volumeLevel .. ".ogg", self.db.profile.soundChannel)
+                                print("Clicker test sound played on channel " .. self.db.profile.soundChannel .. ", filename is " .. self.db.profile.volumeLevel)
+                            end
+                        end,
+                    },
                     volumeHeader = {
 						name = "Volume Settings",
 						type = "header",
@@ -111,9 +123,9 @@ function Clicker:BuildOptionsPanel()
                         order = 2.3,
                         values = {
                             ["Default"] = "Default",
-                            ["+6db"] = "clicker6",
-                            ["+12db"] = "clicker12",
-                            ["+18db"] = "clicker18",
+                            ["clicker6"] = "+6db",
+                            ["clicker12"] = "+12db",
+                            ["clicker18"] = "+18db",
                         },
                         style = "dropdown",
                         get = function(info) return self.db.profile.volumeLevel end,
@@ -154,7 +166,7 @@ function Clicker:OnInitialize()
 
         elseif command == "test" then
             if not self.db.profile.muted then 
-                PlaySoundFile("Interface\\Addons\\Clicker\\Media\\" .. self.db.profile.useClick .. ".ogg", self.db.profile.soundChannel)
+                PlaySoundFile("Interface\\Addons\\Clicker\\Media\\" .. self.db.profile.volumeLevel .. ".ogg", self.db.profile.soundChannel)
             print("Clicker test sound played on channel " .. self.db.profile.soundChannel .. ", filename is " .. self.db.profile.volumeLevel)
             end
 
