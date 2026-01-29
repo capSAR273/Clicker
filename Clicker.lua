@@ -28,13 +28,13 @@ function Clicker:BuildOptionsPanel()
 				type = "description",
 				fontSize = "medium",
 				order = 2,
-				name = "|TInterface\\AddOns\\Clicker\\Media\\clicker100_trans:100:100:0:20|t |cFFFFFFFFMade by  |cFFC41E3ARatrampage-Nazgrim|r \n",
+				name = "|TInterface\\AddOns\\Clicker\\Media\\clicker100_trans:100:100:0:20|t |cFFFFFFFFMade by  |cFFC69B6DRatrampage-Nazgrim|r \n",
 			},
             numClicks = {
                 type = "description",
                 fontSize = "medium",
                 order = 3,
-                name = function() return ("Total Clicks Recorded: %d|cFF36F7BC"):format(Clicker.db.profile.numClicks) end
+                name = function() return ("Total Clicks Recorded: |cFF36F7BC%d"):format(Clicker.db.profile.numClicks) end
             },
             main = {
                 name = "General Options",
@@ -224,35 +224,34 @@ kbTracker:SetScript("OnEvent", kbHandler)
 local eventListenerFrame = CreateFrame("Frame", "ClickerEventListenerFrame", UIParent)
 
 function Clicker:playClick()
-    print("Calling playClick function")
     if not Clicker.db.profile.muted then
         PlaySoundFile("Interface\\AddOns\\Clicker\\Media\\" .. Clicker.db.profile.volumeLevel .. ".ogg", Clicker.db.profile.soundChannel)
         --print("Clicker test sound played on channel " .. Clicker.db.profile.soundChannel .. ", filename is " .. Clicker.db.profile.volumeLevel)
         Clicker.db.profile.numClicks = Clicker.db.profile.numClicks + 1
-        
+        print("|cFF36F7BCClick! " .. Clicker.db.profile.toastText .. " You have clicked " .. Clicker.db.profile.numClicks .. " times.|r")
         --print(Clicker.db.profile.numClicks .. " total clicks recorded.")
     end
 end
 
 local function eventHandler(self, event, ...)
     if event == "PLAYER_LEVEL_UP" then
-        print("Player has leveled up. Click Time!.")
         if not Clicker.db.profile.muted then
+            print("Player has leveled up. Click Time!")
             Clicker:playClick()
         end
     elseif event == "ACHIEVEMENT_EARNED" then
-        print("Player earned an achievement. Click Time!.")
         if not Clicker.db.profile.muted then
+            print("Player earned an achievement. Click Time!")
             Clicker:playClick()
         end
     elseif event == "NEW_PET_ADDED" then
-        print("Player added a new pet to their collection. Click Time!.")
         if not Clicker.db.profile.muted then
+            print("Player added a new pet to their collection. Click Time!")
             Clicker:playClick()
         end
     elseif event == "ZONE_CHANGED" then
-        print("Player changed zones (debug). Click Time!.")
         if not Clicker.db.profile.muted then
+            print("Player changed zones (debug). Click Time!")
             Clicker:playClick()
         end
     end
