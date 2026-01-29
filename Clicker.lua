@@ -22,7 +22,7 @@ function Clicker:BuildOptionsPanel()
 				type = "description",
 				fontSize = "large",
 				order = 1,
-				name = "                             |cFF36F7BC" .. "Clicker: v" .. GetAddOnMetadata("Clicker", "Version"),
+				name = "                             |c" .. Clicker.db.profile.clickChatColor .. "Clicker: v" .. GetAddOnMetadata("Clicker", "Version"),
             },
             authorText = {
 				type = "description",
@@ -34,7 +34,7 @@ function Clicker:BuildOptionsPanel()
                 type = "description",
                 fontSize = "medium",
                 order = 3,
-                name = function() return ("Total Clicks Recorded: |cFF36F7BC%d"):format(Clicker.db.profile.numClicks) end
+                name = function() return ("Total Clicks Recorded: |c" .. Clicker.db.profile.clickChatColor .. "%d"):format(Clicker.db.profile.numClicks) end
             },
             main = {
                 name = "General Options",
@@ -96,7 +96,7 @@ function Clicker:BuildOptionsPanel()
                     clickChatColor = {
                         type = "input",
                         name = "Click Chat Color",
-                        desc = "Enter an 8 digit hex color code here for the click chat messages. Example: FF36F7BC for a light blue color.",
+                        desc = "Enter an 8 digit hex color code here for the Clicker texts. Example: FF36F7BC for a light blue color.",
                         order = 1.6,
                         get = function(info) return Clicker.db.profile.clickChatColor end,
                         set = function(info, value) Clicker.db.profile.clickChatColor = value end,
@@ -161,7 +161,7 @@ function Clicker:OnInitialize()
             clickerEnabled = true,
             toastEnabled = true,
             toastText = "Good Job!",
-            clickChatColor = "FF36F7BC",
+            clickChatColor = "FFFF73A5",
             muted = false,
             soundChannel = "Master",
             volumeLevel = "Default",
