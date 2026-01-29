@@ -254,7 +254,7 @@ local function eventHandler(self,event, ...)
         print("(debug) Player has leveled up. Click Time!")
         Clicker:playClick()
         if Clicker.db.profile.toastEnabled then
-            Clicker:showToast("Level Up!: " .. Clicker.playerLevel, Clicker.playerLevel, addonpath .. "Media\\bone_bw64", nil)
+            Clicker:showToast("+ Level Up! +")
         end
     elseif event == "ACHIEVEMENT_EARNED" then
         print("(debug) Player earned an achievement. Click Time!")
