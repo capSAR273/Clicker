@@ -40,7 +40,8 @@
         "FONT_COLOR_CODE_CLOSE",
         "hash_SlashCmdList",
         "MinimalSliderWithSteppersMixin",
-        "BACKGROUND"
+        "BACKGROUND",
+        "COMPLETE"
     ],
     "Lua.diagnostics.disable": [
         "assign-type-mismatch"

@@ -9,10 +9,8 @@ Clicker.playerGUID = UnitGUID("player")
 Clicker.playerName = UnitName("player")
 local addonpath = "Interface\\AddOns\\Clicker\\"
 local _G = _G
-print ("Clicker Loaded Successfully")
 
 function Clicker:BuildOptionsPanel()
-    print("Building Clicker Options Panel")
     local options = {
         name = "Clicker Options",
         handler = Clicker,
@@ -149,13 +147,10 @@ function Clicker:BuildOptionsPanel()
         },
     }
     Clicker.optionsFrame = AceConfigDialog:AddToBlizOptions("Clicker_options", "Clicker")
-    print("Clicker Options Panel Built")
     AceConfig:RegisterOptionsTable("Clicker_options", options, nil)
-    print("Clicker Options Registered")
 end
 
 function Clicker:OnInitialize()
-    print("clicker OnInitialize ran")
     local defaults = {
         profile = {
             clickerEnabled = true,
@@ -174,11 +169,7 @@ function Clicker:OnInitialize()
         command = strlower(command or "")
         rest = strlower(rest or "")
 
-        if command == "resetClicks" then
-            self.db.profile.numClicks = 0
-            print("Clicker total clicks reset to 0.")
-
-        elseif command == "test" then
+        if command == "test" then
             if not self.db.profile.muted then PlaySoundFile(addonpath .."Media\\" .. self.db.profile.volumeLevel .. ".ogg", self.db.profile.soundChannel)
             print("Clicker test sound played on channel " .. self.db.profile.soundChannel .. ", filename is " .. self.db.profile.volumeLevel)
             end
@@ -197,10 +188,18 @@ function Clicker:OnInitialize()
             if not self.db.profile.muted then PlaySoundFile(addonpath .."Media\\clicker18.ogg", self.db.profile.soundChannel)
             print("Clicker test +18db sound played on the channel " .. self.db.profile.soundChannel)
             end
+        elseif command == "resetAll" then
+            self.db.profile.clickerEnabled = true
+            self.db.profile.toastEnabled = true
+            self.db.profile.toastText = "Good Job!"
+            self.db.profile.clickChatColor = "FFFF73A5"
+            self.db.profile.muted = false
+            self.db.profile.soundChannel = "Master"
+            self.db.profile.volumeLevel = "Default"
+            print("All Clicker settings have been reset to defaults.")
 
         else
             print("Clicker Addon Commands:")
-            print("/clicker resetClicks - Reset total click count to 0 :(")
             print("/clicker test - Play test click sound.")
             print("/clicker test6 - Play test +6db click sound.")
             print("/clicker test12 - Play test +12db click sound.")
@@ -208,7 +207,6 @@ function Clicker:OnInitialize()
         end
     end
     self.db = LibStub("AceDB-3.0"):New("ClickerDB", defaults, true)
-    print("ClickerDB initialized.")
 end
 
 function Clicker:OnEnable()
@@ -248,6 +246,9 @@ local function eventHandler(self, event, ...)
         if not Clicker.db.profile.muted then
             print("Player has leveled up. Click Time!")
             Clicker:playClick()
+            if not Clicker.db.profile.toatstEnabled then
+                Clicker:createToastFrame()
+            end
         end
     elseif event == "ACHIEVEMENT_EARNED" then
         if not Clicker.db.profile.muted then
@@ -263,75 +264,112 @@ local function eventHandler(self, event, ...)
         if not Clicker.db.profile.muted then
             print("Player changed zones (debug). Click Time!")
             Clicker:playClick()
+            if not Clicker.db.profile.toatstEnabled then
+                Clicker:createToastFrame()
+            end
         end
     end
 end
+--Register events to watch here
 eventListenerFrame:SetScript("OnEvent", eventHandler)
 eventListenerFrame:RegisterEvent("PLAYER_LEVEL_UP")
 eventListenerFrame:RegisterEvent("ACHIEVEMENT_EARNED")
 eventListenerFrame:RegisterEvent("NEW_PET_ADDED")
 eventListenerFrame:RegisterEvent("ZONE_CHANGED")
 
-function Clicker:showToast()
-    local clickerToastFrame = CreateFrame("Button", "Achievement", UIParent)
-    clickerToastFrame:SetSize(300, 88)
-    clickerToastFrame:SetFrameStrata("DIALOG")
-    clickerToastFrame:Hide()
+function Clicker:createToastFrame()
+    local clickerTF = CreateFrame("Button", "Achievement", UIParent)
+    clickerTF:SetSize(300, 88)
+    clickerTF:SetFrameStrata("DIALOG")
+    clickerTF:Hide()
 
     do --animations
-        clickerToastFrame:SetScript("OnShow", function()
-           this.modifyA = 1
-           this.modifyB = 0
-           this.stateA = 0
-           this.stateB = 0
-           this.animate = true
+        clickerTF:SetScript("OnShow", function()
+           self.modifyA = 1
+           self.modifyB = 0
+           self.stateA = 0
+           self.stateB = 0
+           self.animate = true
 
-           this.showTime = GetTime()
+           self.showTime = GetTime()
         end)
 
-        clickerToastFrame:SetScript("OnUpdate", function()
-           if ( this.animate ) then
-              local elapsed = GetTime() - this.showTime
+        clickerTF:SetScript("OnUpdate", function()
+           if ( self.animate ) then
+              local elapsed = GetTime() - self.showTime
 
-              if ( this.stateA == 0 ) then
-                 this.modifyA = this.modifyA - 0.05
-                 if ( this.modifyA <= 0 ) then
-                    this.modifyA = 0
-                    this.stateA = 1
-                    this.showTime = GetTime()
+              if ( self.stateA == 0 ) then
+                 self.modifyA = self.modifyA - 0.05
+                 if ( self.modifyA <= 0 ) then
+                    self.modifyA = 0
+                    self.stateA = 1
+                    self.showTime = GetTime()
                  end
-                 this:SetAlpha( 1 - this.modifyA )
-              elseif ( this.stateA == 1 ) then
+                 self:SetAlpha( 1 - self.modifyA )
+              elseif ( self.stateA == 1 ) then
                  if ( elapsed >= 3 ) then
-                    this.stateA = 2
+                    self.stateA = 2
                  end
-              elseif ( this.stateA == 2 ) then
-                 this.modifyA = this.modifyA + 0.05
-                 if ( this.modifyA >= 1 ) then
-                    this.modifyA = 1
-                    this.animate = false
-                    this:Hide()
+              elseif ( self.stateA == 2 ) then
+                 self.modifyA = self.modifyA + 0.05
+                 if ( self.modifyA >= 1 ) then
+                    self.modifyA = 1
+                    self.animate = false
+                    self:Hide()
                  end
-                 this:SetAlpha( 1 - this.modifyA )
+                 self:SetAlpha( 1 - self.modifyA )
               end
            end
         end)    
 
-        clickerToastFrame.background = clickerToastFrame:CreateTexture("background", "BACKGROUND")
-        clickerToastFrame.background:SetTexture(addonpath .. "Media\\ui-achievement-alert-background")
-        clickerToastFrame.background:SetPoint("TOPLEFT", 0, 0)
-        clickerToastFrame.background:SetPoint("BOTTOMRIGHT", 0, 0)
-        clickerToastFrame.background:SetTexCoord(0, .605, 0, .703)
+        clickerTF.background = clickerTF:CreateTexture("background", "BACKGROUND")
+        clickerTF.background:SetTexture(addonpath .. "Media\\ui-achievement-alert-background")
+        clickerTF.background:SetPoint("TOPLEFT", 0, 0)
+        clickerTF.background:SetPoint("BOTTOMRIGHT", 0, 0)
+        clickerTF.background:SetTexCoord(0, .605, 0, .703)
 
-        clickerToastFrame.unlocked = clickerToastFrame:CreateFontString("Unlocked", "OVERLAY", Clicker.db.profile.clickChatColor)
-        clickerToastFrame.unlocked:SetPoint("LEFT", clickerToastFrame, "LEFT", 60, 15)
-        clickerToastFrame.unlocked:SetFont(addonpath .. "Media\\PB-JyRM.ttf", 16, "OUTLINE")
-        clickerToastFrame.unlocked:SetText(Clicker.db.profile.toastText)
+        clickerTF.unlocked = clickerTF:CreateFontString("Unlocked", "OVERLAY", Clicker.db.profile.clickChatColor)
+        clickerTF.unlocked:SetSize(200, 12)
+        clickerTF.unlocked:SetPoint("LEFT", clickerTF, "TOP", 7, -23)
+        clickerTF.unlocked:SetFont(addonpath .. "Media\\PB-JyRM.ttf", 12, "OUTLINE")
+        clickerTF.unlocked:SetText(Clicker.db.profile.toastText)
 
+        clickerTF.name = clickerTF:CreateFontString("Name", "OVERLAY", Clicker.db.profile.clickChatColor)
+        clickerTF.name:SetSize(240, 16)
+        clickerTF.name:SetPoint("BOTTOMLEFT", clickerTF, "TOP", 72, 36)
+        clickerTF.name:SetPoint("BOTTOMRIGHT", clickerTF, "TOP", -60, 36)
 
-    if Clicker.db.profile.toastEnabled then
-        C_Timer.After(0.5, function()
-            --print("Showing Clicker Toast")
-            local toast = C_Toast.New( {
-                text = Clicker.db.profile.toastText,
-                icon = addonpath .. "Media\\ui-achievement-alert-icon"
+        clickerTF.glow = clickerTF:CreateTexture("glow", "OVERLAY")
+        clickerTF.glow:SetTexture(addonpath .. "Media\\ui-achievement-alert-glow")
+        clickerTF.glow:SetBlendMode("ADD")
+        clickerTF.glow:SetWidth(400)
+        clickerTF.glow:SetHeight(171)
+        clickerTF.glow:SetPoint("CENTER", 0, 0)
+        clickerTF.glow:SetTexCoord(0, 0.78125, 0, 0.66796875)
+        clickerTF.glow:SetAlpha(0)
+
+        clickerTF.shine = clickerTF:CreateTexture("shine", "OVERLAY")
+        clickerTF.shine:SetBlendMode("ADD")
+        clickerTF.shine:SetTexture(addonpath .. "Media\\ui-achievement-alert-glow")
+        clickerTF.shine:SetWidth(67)
+        clickerTF.shine:SetHeight(72)
+        clickerTF.shine:SetPoint("BOTTOMLEFT", 0, 8)
+        clickerTF.shine:SetTexCoord(0.78125, 0.912109375, 0, 0.28125)
+        clickerTF.shine:SetAlpha(0)
+
+        return clickerTF
+    end
+end
+
+function Clicker:showToast(text, points, icon, elite, header)
+    for i=1, Clicker.max_window do
+        if not Clicker.window[i].IsVisible() then
+            Clicker.window[i].unlocked:SetText(header or COMPLETE)
+            Clicker.window[i].name:SetText(text or "DUMMY")
+            Clicker.window[i].icon.texture:SetTexture(addonpath .. "Media\\bone_trans64")
+            Clicker.window[i].points:SetText(points or "")
+            Clicker.window[i]:Show()
+            return
+        end
+    end
+end
