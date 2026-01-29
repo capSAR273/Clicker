@@ -16,7 +16,7 @@ Clicker.max_window = 5
 
 function Clicker:BuildOptionsPanel()
     local options = {
-        name = "Clicker Options",
+        name = "Clicker Addon Configuration",
         handler = Clicker,
         type = "group",
         args = {
@@ -59,7 +59,7 @@ function Clicker:BuildOptionsPanel()
                     },
                     toastEnabled = {
                         type = "toggle",
-                        name = "Enable Achievement Popup",
+                        name = "Enable Event Popup",
                         desc = "Enable to see a Blizzard-style Achievement popup on clicker events!",
                         order = 1.2,
                         get = function(info) return Clicker.db.profile.toastEnabled end,
@@ -102,6 +102,14 @@ function Clicker:BuildOptionsPanel()
                         order = 1.6,
                         get = function(info) return Clicker.db.profile.clickChatColor end,
                         set = function(info, value) Clicker.db.profile.clickChatColor = value end,
+                    },
+                    secretSetting = {
+                        type = "toggle",
+                        name = "Enable Secret?",
+                        desc = "A mysterious setting that does nothing... or does it?",
+                        order = 1.7,
+                        get = function(info) return Clicker.db.profile.bark end,
+                        set = function(info, value) Clicker.db.profile.bark = value end,
                     },
                     volumeHeader = {
 						name = "Volume Settings",
