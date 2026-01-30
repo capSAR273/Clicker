@@ -4,6 +4,7 @@ Clicker = LibStub("AceAddon-3.0"):NewAddon("Clicker", "AceConsole-3.0", "AceTime
 AceConfig = LibStub("AceConfig-3.0")
 AceConfigDialog = LibStub("AceConfigDialog-3.0")
 local defaults = {}
+
 local GetAddOnMetadata = C_AddOns and C_AddOns.GetAddOnMetadata
 Clicker.playerGUID = UnitGUID("player")
 Clicker.playerName = UnitName("player")
@@ -14,16 +15,6 @@ local _G = _G
 Clicker.window = {}
 Clicker.max_window = 5
 Lwin = LibStub("LibWindow-1.1")
-
-local moveFrame = CreateFrame("Frame", "ClickerMoveFrame", UIParent, "BackdropTemplate")
-moveFrame:SetSize(300, 500)
-moveFrame:SetPoint("CENTER")
-moveFrame:SetBackdrop(BACKDROP_TUTORIAL_16_16)
-moveFrame.title = moveFrame:CreateFontString(nil, "OVERLAY")
-moveFrame.title:SetFontObject("GameFontHighlight")
-moveFrame.title:SetPoint("TOP", moveFrame.TitleBg, "CENTER", 0, 0)
-moveFrame.title:SetText("Clicker Popup Mover")
-moveFrame:SetAlpha(0)
 
 function Clicker:BuildOptionsPanel()
     local options = {
@@ -166,7 +157,6 @@ function Clicker:BuildOptionsPanel()
 end
 
 function Clicker:OnInitialize()
-    self.db = LibStub("AceDB-3.0"):New("ClickerDB", defaults, true)
     defaults = {
         profile = {
             clickerEnabled = true,
@@ -180,6 +170,10 @@ function Clicker:OnInitialize()
             bark = false,
         },
     }
+    --Lwin.RestorePosition(Clicker.moveFrame)
+end
+
+function Clicker:regCommands(mFrame)
     SLASH_CLICKER1 = "/clicker"
     SlashCmdList["CLICKER"] = function(msg, editbox)
         local command, rest = msg:match("^(%S*)%s*(.-)$")
@@ -222,14 +216,11 @@ function Clicker:OnInitialize()
                 print("You found the easter egg! Your speech has been enhanced!")
             end
         elseif command == "move" then
-            if moveFrame:GetAlpha() == 1 then
-                Lwin.SavePosition(moveFrame)
-                moveFrame:SetAlpha(0)
+            if mFrame:GetAlpha() == 1 then
+                mFrame:SetAlpha(0)
                 print("Clicker popup mover hidden.")
             else
-                moveFrame:SetAlpha(1)
-                Lwin.MakeDraggable(moveFrame)
-                Lwin.EnableMouseOnAlt(moveFrame)
+                mFrame:SetAlpha(1)
                 print("Clicker popup mover shown. Drag it to reposition the popup location.")
             end
         else
@@ -242,15 +233,35 @@ function Clicker:OnInitialize()
             print("/clicker secret - ???");
         end
     end
-    Lwin.RegisterConfig(moveFrame, self.db.profile)
+end
+
+function Clicker:createMoveFrame()
+    local moveFrame = CreateFrame("Frame", "ClickerMoveFrame", UIParent, "BackdropTemplate")
+    moveFrame:SetSize(300, 500)
+    moveFrame:SetPoint("CENTER")
+    moveFrame:SetBackdrop(BACKDROP_TUTORIAL_16_16)
+    moveFrame.title = moveFrame:CreateFontString(nil, "OVERLAY")
+    moveFrame.title:SetFontObject("GameFontHighlight")
+    moveFrame.title:SetPoint("TOP", moveFrame, "CENTER", 0, 0)
+    moveFrame.title:SetText("Clicker Popup Mover")
+    moveFrame:SetAlpha(0)
+    Lwin.RegisterConfig(moveFrame, Clicker.db.profile)
+    Lwin.MakeDraggable(moveFrame)
+    Lwin.EnableMouseOnAlt(moveFrame)
+    Lwin.RestorePosition(moveFrame)
+    return moveFrame
 end
 
 function Clicker:OnEnable()
+    self.db = LibStub("AceDB-3.0"):New("ClickerDB", defaults, true)
     Clicker:BuildOptionsPanel()
+    local mFrame = Clicker:createMoveFrame()
     for i=1, Clicker.max_window do
-        Clicker.window[i] = Clicker:createToastFrame()
+        Clicker.window[i] = Clicker:createToastFrame(mFrame)
         Clicker.window[i]:SetPoint("BOTTOM", 0, -100 + (100*i))
-    end
+    end 
+    Clicker:regCommands(mFrame)
+    Lwin.RestorePosition(mFrame)
 end
 
 local kbTracker = CreateFrame("Frame", "KBTracker", UIParent)
@@ -315,9 +326,9 @@ eventListenerFrame:RegisterEvent("ZONE_CHANGED")
 eventListenerFrame:RegisterEvent("CHALLENGE_MODE_COMPLETED")
 eventListenerFrame:RegisterEvent("CHALLENGE_MODE_NEW_RECORD")
 
-function Clicker:createToastFrame()
+function Clicker:createToastFrame(mFrame)
     --AchievementAlertFrameTemplate?
-    local clickerTF = CreateFrame("Button", "Achievement", moveFrame)
+    local clickerTF = CreateFrame("Button", "Achievement", mFrame)
     clickerTF:SetSize(300, 88)
     clickerTF:SetFrameStrata("DIALOG")
     clickerTF:SetIgnoreParentAlpha(true)
