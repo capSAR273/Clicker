@@ -4,15 +4,29 @@ Clicker = LibStub("AceAddon-3.0"):NewAddon("Clicker", "AceConsole-3.0", "AceTime
 AceConfig = LibStub("AceConfig-3.0")
 AceConfigDialog = LibStub("AceConfigDialog-3.0")
 
+
 local GetAddOnMetadata = C_AddOns and C_AddOns.GetAddOnMetadata
 Clicker.playerGUID = UnitGUID("player")
 Clicker.playerName = UnitName("player")
 Clicker.playerLevel = UnitLevel("player")
 local addonpath = "Interface\\AddOns\\Clicker\\"
 local _G = _G
+local lwin = LibStub("LibWindow-1.1")
 
 Clicker.window = {}
 Clicker.max_window = 5
+
+
+local moveFrame = CreateFrame("Frame", "ClickerMoveFrame", UIParent, "BackdropTemplate")
+moveFrame:SetSize(300, 500)
+moveFrame:SetPoint("CENTER")
+moveFrame:SetBackdrop(BACKDROP_TUTORIAL_16_16)
+moveFrame.title = moveFrame:CreateFontString(nil, "OVERLAY")
+moveFrame.title:SetFontObject("GameFontHighlight")
+moveFrame.title:SetPoint("LEFT", moveFrame.TitleBg, "CENTER", 5, 0)
+moveFrame.title:SetText("Clicker Popup Mover")
+moveFrame:SetAlpha(0)
+lwin.RegisterConfig(moveFrame, Clicker.db.profile)
 
 function Clicker:BuildOptionsPanel()
     local options = {
@@ -49,19 +63,11 @@ function Clicker:BuildOptionsPanel()
 						width = "full",
 						order = 1.0,
 					},
-                    clickerEnabled = {
-                        type = "toggle",
-                        name = "Enable Clicker",
-                        desc = "Toggle the Clicker addon functions on or off.",
-                        order = 1.1,
-                        get = function(info) return Clicker.db.profile.clickerEnabled end,
-                        set = function(info, value) Clicker.db.profile.clickerEnabled = value end,
-                    },
                     toastEnabled = {
                         type = "toggle",
                         name = "Enable Event Popup",
                         desc = "Enable to see a Blizzard-style Achievement popup on clicker events!",
-                        order = 1.2,
+                        order = 1.1,
                         get = function(info) return Clicker.db.profile.toastEnabled end,
                         set = function(info, value) Clicker.db.profile.toastEnabled = value end,
                     },
@@ -69,7 +75,7 @@ function Clicker:BuildOptionsPanel()
                         type = "input",
                         name = "Click Toast Text",
                         desc = "Text the addon will congratulate you with each time a click event happens.",
-                        order = 1.3,
+                        order = 1.2,
                         get = function(info) return Clicker.db.profile.toastText end,
                         set = function(info, value) Clicker.db.profile.toastText = value end,
                     },
@@ -77,7 +83,7 @@ function Clicker:BuildOptionsPanel()
                         type = "execute",
                         name = "Test Click Sound",
                         desc = "Play a test click sound.",
-                        order = 1.4,
+                        order = 1.3,
                         func = function()
                             if not Clicker.db.profile.muted then 
                                 PlaySoundFile(addonpath .."Media\\" .. Clicker.db.profile.volumeLevel .. ".ogg", Clicker.db.profile.soundChannel)
@@ -89,7 +95,7 @@ function Clicker:BuildOptionsPanel()
                         type = "execute",
                         name = "Reset Clicks",
                         desc = "Reset the click counter :(",
-                        order = 1.5,
+                        order = 1.4,
                         func = function()
                             Clicker.db.profile.numClicks = 0
                             print("Clicker total clicks reset to 0.")
@@ -99,7 +105,7 @@ function Clicker:BuildOptionsPanel()
                         type = "input",
                         name = "Click Chat Color",
                         desc = "Enter an 8 digit hex color code here for the Clicker texts. Example: FF36F7BC for a light blue color.",
-                        order = 1.6,
+                        order = 1.5,
                         get = function(info) return Clicker.db.profile.clickChatColor end,
                         set = function(info, value) Clicker.db.profile.clickChatColor = value end,
                     },
@@ -107,7 +113,7 @@ function Clicker:BuildOptionsPanel()
                         type = "toggle",
                         name = "Enable Secret?",
                         desc = "A mysterious setting that does nothing... or does it?",
-                        order = 1.7,
+                        order = 1.6,
                         get = function(info) return Clicker.db.profile.bark end,
                         set = function(info, value) Clicker.db.profile.bark = value end,
                     },
@@ -217,7 +223,19 @@ function Clicker:OnInitialize()
             elseif self.db.profile.bark then
                 print("You found the easter egg! Your speech has been enhanced!")
             end
-            
+        elseif command == "move" then
+            if moveFrame:GetAlpha() == 1 then
+                moveFrame:SetAlpha(0)
+                print("Clicker popup mover hidden.")
+            else
+                moveFrame:SetAlpha(1)
+                moveFrame:EnableMouse(true)
+                moveFrame:SetMovable(true)
+                moveFrame:RegisterForDrag("LeftButton")
+                moveFrame:SetScript("OnDragStart", moveFrame.StartMoving)
+                moveFrame:SetScript("OnDragStop", lwin.SavePosition)
+                print("Clicker popup mover shown. Drag it to reposition the popup location.")
+            end
         else
             print("Clicker Addon Commands:")
             print("/clicker test - Play test click sound.")
@@ -228,6 +246,7 @@ function Clicker:OnInitialize()
             print("/clicker secret - ???");
         end
     end
+    lwin.RestorePosition(moveFrame)
     self.db = LibStub("AceDB-3.0"):New("ClickerDB", defaults, true)
 end
 
@@ -235,7 +254,7 @@ function Clicker:OnEnable()
     Clicker:BuildOptionsPanel()
     for i=1, Clicker.max_window do
         Clicker.window[i] = Clicker:createToastFrame()
-        Clicker.window[i]:SetPoint("RIGHT", -350, -100 + (100*i))
+        Clicker.window[i]:SetPoint("BOTTOM", 0, -100 + (100*i))
     end
 end
 
@@ -258,12 +277,10 @@ kbTracker:SetScript("OnEvent", kbHandler)
 local eventListenerFrame = CreateFrame("Frame", "ClickerEventListenerFrame", UIParent)
 
 function Clicker:playClick()
-    if not Clicker.db.profile.muted then
+    if not Clicker.db.profile.muted and Clicker.db.profile.clickerEnabled then
         PlaySoundFile(addonpath .."Media\\" .. Clicker.db.profile.volumeLevel .. ".ogg", Clicker.db.profile.soundChannel)
-        --print("Clicker test sound played on channel " .. Clicker.db.profile.soundChannel .. ", filename is " .. Clicker.db.profile.volumeLevel)
         Clicker.db.profile.numClicks = Clicker.db.profile.numClicks + 1
         print("|c" .. Clicker.db.profile.clickChatColor .. "Click! " .. Clicker.db.profile.toastText .. " You have clicked " .. Clicker.db.profile.numClicks .. " times.|r")
-        --print(Clicker.db.profile.numClicks .. " total clicks recorded.")
     end
 end
 
@@ -300,14 +317,16 @@ eventListenerFrame:RegisterEvent("PLAYER_LEVEL_UP")
 eventListenerFrame:RegisterEvent("ACHIEVEMENT_EARNED")
 eventListenerFrame:RegisterEvent("NEW_PET_ADDED")
 eventListenerFrame:RegisterEvent("ZONE_CHANGED")
+eventListenerFrame:RegisterEvent("CHALLENGE_MODE_COMPLETED")
+eventListenerFrame:RegisterEvent("CHALLENGE_MODE_NEW_RECORD")
 
 function Clicker:createToastFrame()
-    local clickerTF = CreateFrame("Button", "Achievement", UIParent)
-    print("Creating Toast Frame")
+    --AchievementAlertFrameTemplate?
+    local clickerTF = CreateFrame("Button", "Achievement", moveFrame)
     clickerTF:SetSize(300, 88)
     clickerTF:SetFrameStrata("DIALOG")
+    clickerTF:SetIgnoreParentAlpha(true)
     clickerTF:Hide()
-
     do --animations
         clickerTF:SetScript("OnShow", function()
            clickerTF.modifyA = 1
@@ -420,6 +439,9 @@ function Clicker:createToastFrame()
 end
 
 function Clicker:showToast(text)
+    if Clicker.db.profile.toastEnabled == false then
+        return
+    end
     for i=1, Clicker.max_window do
         if not Clicker.window[i]:IsVisible() then
             Clicker.window[i].toastGreet:SetText("|c" .. Clicker.db.profile.clickChatColor .. Clicker.db.profile.toastText .. "|r")

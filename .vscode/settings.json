@@ -42,7 +42,9 @@
         "MinimalSliderWithSteppersMixin",
         "BACKGROUND",
         "COMPLETE",
-        "RAID"
+        "RAID",
+        "BACKDROP_TUTORIAL_16_16",
+        "ChatFrame1"
     ],
     "Lua.diagnostics.disable": [
         "assign-type-mismatch"
