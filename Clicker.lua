@@ -140,9 +140,9 @@ function Clicker:BuildOptionsPanel()
                         order = 2.3,
                         values = {
                             ["clicker"] = "Default",
-                            ["clicker6"] = "+6db",
                             ["clicker12"] = "+12db",
                             ["clicker18"] = "+18db",
+                            ["clicker6"] = "+6db",
                         },
                         style = "dropdown",
                         get = function(info) return Clicker.db.profile.volumeLevel end,
@@ -413,15 +413,14 @@ local randEvents = {
     "Level Up! Woohoo!",
     "Fresh Achievement!",
     "New Pet Added!",
-    "Zone Changed",
     "Quest Complete!",
     "House Level Increased!",
     "New Mount Unlocked!",
     "New Housing Item!",
-    "New Toy Acquired!",
+    "New Toy Added!",
     "BMAH Bid Won!",
-    "New Weekly M+ Record!",
-    "New Appearance Added!"
+    "New M+ Record!",
+    "New Appearance!"
 }
 
 local function pickRandEvent()
