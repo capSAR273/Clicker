@@ -18,3 +18,4 @@ ignore:
   - Libs/*/*.toc
   - Libs/*/*.txt
   - Libs/*/*.textile
+  - CHANGES.txt

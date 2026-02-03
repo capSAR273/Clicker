@@ -643,8 +643,9 @@ function Clicker:createToastFrame(mFrame)
 
         clickerTF.eventName = clickerTF:CreateFontString("Name", "OVERLAY", "GameFontHighlight")
         clickerTF.eventName:SetSize(280, 16)
-        clickerTF.eventName:SetPoint("BOTTOMLEFT", 72, 35)
+        clickerTF.eventName:SetPoint("BOTTOMLEFT", 77, 35)
         clickerTF.eventName:SetPoint("BOTTOMRIGHT", -60, 35)
+        clickerTF.eventName:SetJustifyH("LEFT")
         clickerTF.eventName:SetFont(addonpath .. "Media\\WinterLandByJd-Bold.ttf", 14, "")
 
         clickerTF.glow = clickerTF:CreateTexture("glow", "OVERLAY")
@@ -702,6 +703,8 @@ function Clicker:showToast(text)
             Clicker.window[i].toastGreet:SetText("|c" .. Clicker.db.profile.clickChatHex .. Clicker.db.profile.toastText .. "|r")
             Clicker.window[i].eventName:SetText("|c" .. Clicker.db.profile.clickChatHex .. text .. "|r")
             Clicker.window[i].icon.text:SetText("|c" .. Clicker.db.profile.clickChatHex .. "!" .. "|r")
+            -- Clicker.window[i].eventName:SetPoint("BOTTOMLEFT", 72, 35)
+            -- Clicker.window[i].eventName:SetPoint("BOTTOMRIGHT", -60, 35)
             Clicker.window[i]:Show()
             return
         end
