@@ -33,7 +33,7 @@ function Clicker:BuildOptionsPanel()
 				type = "description",
 				fontSize = "medium",
 				order = 2,
-				name = "|T" .. addonpath .. "Media\\clicker100_trans:100:100:0:20|t |cFFFFFFFFMade by  |cFFC69B6DFatrat|r \n",
+				name = "|T" .. addonpath .. "Media\\clicker100_trans:100:100:0:20|t |cFFFFFFFFMade by  |cFFC69B6DStellarField|r \n",
 			},
             numClicks = {
                 type = "description",
