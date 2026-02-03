@@ -163,9 +163,9 @@ function Clicker:BuildOptionsPanel()
 					},
                     enabledEvents = {
                         type = "multiselect",
-                        name = "Event Selection for Clicks",
+                        name = "Event Selection",
                         desc = "Which events do you want to receive clicks for?",
-                        order = 3.1,
+                        order = 2.1,
                         values = {
                             levelUpEnabled = "Level Up",
                             achievementEnabled = "Achievement Unlocked",
@@ -415,7 +415,7 @@ local function eventHandler(self,event, ...)
         print("(debug) Player earned an achievement. Click Time!")
         Clicker:playClick()
         if Clicker.db.profile.toastEnabled then
-            Clicker:showToast("Fresh Achievement!")
+            Clicker:showToast("Achievement Unlocked!")
         end
     elseif event == "NEW_PET_ADDED" and Clicker.db.profile.eventsEnabled.newPetEnabled then
         print("(debug) Player added a new pet to their collection. Click Time!")
@@ -439,7 +439,7 @@ local function eventHandler(self,event, ...)
         print("(debug) Player increased house level. Click Time!")
         Clicker:playClick()
         if Clicker.db.profile.toastEnabled then
-            Clicker:showToast("House Level Increased!")
+            Clicker:showToast("House Level Up!")
         end
     elseif event == "NEW_MOUNT_ADDED" and Clicker.db.profile.eventsEnabled.newMountEnabled then
         print("(debug) Player added a new mount. Click Time!")
