@@ -27,7 +27,7 @@ function Clicker:BuildOptionsPanel()
 				type = "description",
 				fontSize = "large",
 				order = 1,
-				name = function() return "                             |c" .. Clicker.db.profile.clickChatHex .. "Clicker: v" .. GetAddOnMetadata("Clicker", "Version") end,
+				name = function() return "                             |c" .. Clicker.db.profile.clickChatHex .. GetAddOnMetadata("Clicker", "Version") end,
             },
             authorText = {
 				type = "description",
