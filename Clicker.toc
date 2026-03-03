@@ -1,4 +1,4 @@
-## Interface: 120000, 11508, 20505, 50503
+## Interface: 120001, 11508, 20505, 50503
 ## Title: Clicker
 ## Notes: This addon will play a clicker sound effect for various events that the player can configure.
 ## Author: StellarField
