@@ -171,8 +171,8 @@ function Clicker:BuildOptionsPanel()
 					},
                     enabledEvents = {
                         type = "multiselect",
-                        name = "Event Selection",
-                        desc = "Which events do you want to receive clicks for?",
+                        name = "Classic Event Selection",
+                        desc = "",
                         hidden = function() return not (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC or WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC) end,
                         order = 2.1,
                         values = {
@@ -186,7 +186,7 @@ function Clicker:BuildOptionsPanel()
                     enabledMistsEvents = {
                         type = "multiselect",
                         name = "MoP Event Selection",
-                        desc = "Which events do you want to receive clicks for?",
+                        desc = "",
                         hidden = function() return not (WOW_PROJECT_ID == 19) end,
                         order = 2.1,
                         values = {
@@ -199,7 +199,7 @@ function Clicker:BuildOptionsPanel()
                     enabledMainlineEvents = {
                         type = "multiselect",
                         name = "Retail Event Selection",
-                        desc = "Which events do you want to receive clicks for?",
+                        desc = "",
                         hidden = function() return not (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE) end,
                         order = 2.1,
                         values = {
@@ -213,7 +213,7 @@ function Clicker:BuildOptionsPanel()
                     enabledMistsMainlineEvents = {
                         type = "multiselect",
                         name = "Other Event Selection",
-                        desc = "Which events do you want to receive clicks for?",
+                        desc = "",
                         hidden = function() return not (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE or WOW_PROJECT_ID == 19) end,
                         order = 2.1,
                         values = {
@@ -364,6 +364,9 @@ function Clicker:regCommands(mFrame)
         elseif command == "move" then
             if mFrame:GetAlpha() == 1 then
                 mFrame:SetAlpha(0)
+                Lwin.SavePosition(mFrame)
+                mFrame:SetMovable(false)
+                --mFrame:EnableMouse(false)
                 print("Clicker popup mover hidden.")
             else
                 mFrame:SetAlpha(1)
@@ -390,8 +393,8 @@ end
 
 function Clicker:createMoveFrame()
     local moveFrame = CreateFrame("Frame", "ClickerMoveFrame", UIParent, "BackdropTemplate")
-    moveFrame:SetSize(300, 500)
-    moveFrame:SetPoint("CENTER")
+    moveFrame:SetSize(100, 50)
+    moveFrame:SetPoint("BOTTOM")
     moveFrame:SetBackdrop(BACKDROP_TUTORIAL_16_16)
     moveFrame.title = moveFrame:CreateFontString(nil, "OVERLAY")
     moveFrame.title:SetFontObject("GameFontHighlight")
@@ -428,8 +431,12 @@ local function kbHandler(...)
         Clicker:playClick()
     end
 end
-kbTracker:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-kbTracker:SetScript("OnEvent", kbHandler)
+--Ugly fix for this since Retail doesn't allow CLEU but classic does
+if(WOW_PROJECT_ID ~= WOW_PROJECT_MAINLINE) then
+    kbTracker:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+    kbTracker:SetScript("OnEvent", kbHandler)
+end
+
 
 
 --Magic happens here! Event Listener Frame and functions
